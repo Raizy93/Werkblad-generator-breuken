@@ -120,6 +120,7 @@
                     <option value="optellen">Breuken optellen</option>
                     <option value="aftrekken">Breuken aftrekken</option>
                     <option value="optellen_aftrekken">Optellen en aftrekken (gemengd)</option>
+                    <option value="vermenigvuldigen">Breuken vermenigvuldigen</option>
                 </select>
             </div>
             <div class="fg" id="noemers-row" style="display:none">
@@ -199,7 +200,8 @@ var TYPE_CONFIG = {
     vergelijken:        {label:'Breuken vergelijken',           hint:'Vul in: <span style="font-weight:700">&lt; &nbsp; &gt; &nbsp; =</span>',                        noemers:true,  opts:[16,20,24,28,32,36], def:24},
     optellen:           {label:'Breuken optellen',              hint:'Tel de breuken op. Schrijf de uitkomst zo eenvoudig mogelijk.',                                 noemers:true,  opts:[16,20,24,28,32,36], def:24},
     aftrekken:          {label:'Breuken aftrekken',             hint:'Trek de breuken van elkaar af. Schrijf de uitkomst zo eenvoudig mogelijk.',                     noemers:true,  opts:[16,20,24,28,32,36], def:24},
-    optellen_aftrekken: {label:'Breuken optellen en aftrekken', hint:'Tel op of trek af. Schrijf de uitkomst zo eenvoudig mogelijk.',                                 noemers:true,  opts:[16,20,24,28,32,36], def:24}
+    optellen_aftrekken: {label:'Breuken optellen en aftrekken', hint:'Tel op of trek af. Schrijf de uitkomst zo eenvoudig mogelijk.',                                 noemers:true,  opts:[16,20,24,28,32,36], def:24},
+    vermenigvuldigen:   {label:'Breuken vermenigvuldigen',      hint:'Vermenigvuldig het gehele getal met de breuk. Schrijf de uitkomst zo eenvoudig mogelijk.',       noemers:false, opts:[16,20,24,28,32,36], def:24}
 };
 
 function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){var t=b;b=a%b;a=t;}return a||1;}
@@ -285,6 +287,16 @@ function genAftrekken(d,noe){
     return{q:F(a.n,a.d)+' \u2212 '+F(b.n,b.d)+' = '+BLANK(),
            a:F(a.n,a.d)+' \u2212 '+F(b.n,b.d)+' = '+(rn===0?'<strong>0</strong>':MIX(rn,L))};
 }
+function genVermenigvuldigen(d){
+    var whole={makkelijk:[2,3,4,5],gemiddeld:[2,3,4,5,6,8],moeilijk:[3,4,5,6,7,8,9,10]}[d];
+    var w=pick(whole),f=pf(d);
+    var rn=w*f.n;
+    var r=reduce(rn,f.d);
+    var needsFinal=(rn>=f.d)||(r.n!==rn||r.d!==f.d);
+    var ans=F(rn,f.d)+(needsFinal?' = '+MIX(rn,f.d):'');
+    return{q:'<strong>'+w+'</strong> \u00d7 '+F(f.n,f.d)+' = '+BLANK(),
+           a:'<strong>'+w+'</strong> \u00d7 '+F(f.n,f.d)+' = '+ans};
+}
 function makeEx(type,diff,noe){
     switch(type){
         case 'herkenning':         return genHerkenning(diff);
@@ -293,6 +305,7 @@ function makeEx(type,diff,noe){
         case 'optellen':           return genOptellen(diff,noe);
         case 'aftrekken':          return genAftrekken(diff,noe);
         case 'optellen_aftrekken': return Math.random()>.5?genOptellen(diff,noe):genAftrekken(diff,noe);
+        case 'vermenigvuldigen':   return genVermenigvuldigen(diff);
     }
 }
 
